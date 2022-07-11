@@ -14,10 +14,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from pages_const import *
 
 
-
 def parse_scada_projects(project):
     all_projects = os.listdir(path_to_projects)
-    project = project+'.mtp'
+    project = project + '.mtp'
     if project in all_projects:
         return True
     else:
@@ -25,23 +24,23 @@ def parse_scada_projects(project):
 
 
 def upload_test_project(project):
-    project = project+'.mtp'
-    try:        
+    project = project + '.mtp'
+    try:
         source = os.path.join(path_source, project)
         destination = os.path.join(path_to_projects, project)
         shutil.copyfile(source, destination)
-        return True        
+        return True
     except:
         return False
-    
+
 
 def parse_dba_config():
     path_to_xml = r'C:\Program Files (x86)\Механотроника\WebScadaMT\Data\dba_config.xml'
-    DbSize_need =       '10737418240'
-    BackupSize_need =   '268435456'
+    DbSize_need = '10737418240'
+    BackupSize_need = '268435456'
     try:
         tree = ET.parse(path_to_xml)
-        root = tree.getroot()        
+        root = tree.getroot()
         DbSize = root.find('DbSize')
         BackupSize = root.find('BackupSize')
 
@@ -55,7 +54,7 @@ def parse_dba_config():
             print('значение BackupSize изменено')
         else:
             print('значение BackupSize не нужно изменять')
-        tree.write(path_to_xml)    
+        tree.write(path_to_xml)
     except:
         print('Не удалось выполнить скрипт')
 
@@ -97,7 +96,7 @@ def upload_the_project(project, driver):
     else:
         print(time.asctime(), current_project)
         print(time.asctime(), "Будет загружен проект:", project)
-        driver.find_element(By.XPATH, '//div[@aria-colindex="2" and text()="'+project+'"]').click()
+        driver.find_element(By.XPATH, '//div[@aria-colindex="2" and text()="' + project + '"]').click()
         driver.find_element(By.XPATH, '//button[text()="Загрузить"]').click()
         time.sleep(1)
         driver.find_element(By.XPATH, '//div[text()="Да"]').click()
@@ -106,13 +105,13 @@ def upload_the_project(project, driver):
         WebDriverWait(driver, 25).until(EC.element_to_be_clickable((By.XPATH, '//button[text()="Закрыть"]')))
         driver.find_element(By.XPATH, '//button[text()="Закрыть"]').click()
         time.sleep(1)
-        new_current_project = driver.find_element(By.XPATH, '//div[@view_id="current_project"]/div[@class="webix_el_box"]').text
+        new_current_project = driver.find_element(By.XPATH,
+                                                  '//div[@view_id="current_project"]/div[@class="webix_el_box"]').text
         assert project in new_current_project, "Проблема с загрузкой требуемого проекта"
 
 
-
 def run_project(project, driver):
-    if parse_scada_projects(project):  
+    if parse_scada_projects(project):
         upload_the_project(project, driver)
     else:
         if upload_test_project(project):
@@ -143,7 +142,7 @@ def delete_old_tables(driver):
         time.sleep(1)
         driver.find_element(By.XPATH, "//button[text()='Подтвердить']").click()
         WebDriverWait(driver, 150).until(EC.element_to_be_clickable((By.XPATH, "//button[text()='Завершить']")))
-        deleted_tables =  driver.find_element(By.XPATH,"//textarea").text
+        deleted_tables = driver.find_element(By.XPATH, "//textarea").text
         assert 'Удалена таблица' in deleted_tables, "Таблицы не удалены"
         time.sleep(1)
         driver.find_element(By.XPATH, "//button[text()='Завершить']").click()
